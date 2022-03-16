@@ -87,9 +87,18 @@ app.route("/api/users").post((req, res) => {
 app.route("/api/users/:_id/exercises").post((req, res) => {
   if (isNaN(req.body.duration)) { res.json({ error: 'invalid duration' }); return console.error('invalid duration') }
   if (req.body.description === "") { res.json({ error: 'invalid description' }); return console.error('invalid description') }
-  if (!(Date.parse(req.body.date) > 0)) { res.json({ error: 'invalid date' }); return console.error('invalid date') }
 
   let date = new Date(req.body.date);
+
+  if (!(Date.parse(req.body.date) > 0)) {
+    if (req.body.date === "" || !req.body.date) {
+      date = new Date();
+    }
+    else {
+      res.json({ error: 'invalid date' }); return console.error('invalid date')
+    }
+  }
+
 
   let exercise = {
     description: req.body.description,
@@ -109,15 +118,11 @@ app.route("/api/users/:_id/logs").get((req, res) => {
     let exercises = data.log;
 
     if (!(req.query.from == "") && req.query.from) {
-      console.log('inside from')
       let from = new Date(req.query.from);
       exercises = exercises.filter(exercise => exercise.date >= from);
     }
     if (!(req.query.to == "") && req.query.to) {
-      console.log('inside to')
       let to = new Date(req.query.to);
-      console.log(req.query.to);
-      console.log(to.toDateString())
       exercises = exercises.filter(exercise => exercise.date <= to);
     }
 
@@ -131,7 +136,7 @@ app.route("/api/users/:_id/logs").get((req, res) => {
       }
     })
 
-    res.json({ username: data.username, count: data.count, _id: data._id, log: exercisesStringDate })
+    res.json({ _id: data._id, username: data.username, count: data.count, log: exercisesStringDate })
   });
 });
 
