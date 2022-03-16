@@ -59,6 +59,14 @@ const findUserById = (personId, done) => {
   });
 };
 
+// Define function to find all users
+const findAllUSers = (done) => {
+  User.find((err, users) => {
+    if (err) return console.error(err);
+    done(null, users);
+  });
+};
+
 // Create User post API
 app.route("/api/users").post((req, res) => {
   if (req.body.username) {
@@ -69,6 +77,9 @@ app.route("/api/users").post((req, res) => {
   else {
     res.json({ error: 'invalid username' })
   }
+}).get((req, res) => {
+  findAllUSers((_, data) => res.send(data))
+
 });
 
 
